@@ -116,7 +116,7 @@ class DBQuery{
  		    	$qs = explode(':', $key);
  		    	$field = $qs[0];
    				$operat = isset($qs[1]) ? $qs[1] : '=';
-   				$sql .= " {$this->escape($field)} $operat {$this->escaped($val)} AND";    
+   				$sql .= " {$this->escapes($field)} $operat {$this->escaped($val)} AND";    
    			}
 			$sql = substr($sql, 0, -3);			
 		}
@@ -179,8 +179,25 @@ class DBQuery{
 	}
 
 	public function delete(){
+		$sql = 'DELETE FROM ';
+		
+		foreach($this->tables as $tbl){
+			$sql .= $this->escape($tbl).', ';
+		}
+		$sql = substr($sql, 0, -2);	
 	
-	
+		if(count($this->wheres)>0){
+			$sql .= ' WHERE ';
+		    foreach($this->wheres as $key => $val){
+ 		    	$qs = explode(':', $key);
+ 		    	$field = $qs[0];
+   				$operat = isset($qs[1]) ? $qs[1] : '=';
+   				$sql .= " {$this->escapes($field)} $operat {$this->escaped($val)} AND";    
+   			}
+			$sql = substr($sql, 0, -3);			
+		}
+		
+		return mysql_query($sql);
 	}
 	
 
