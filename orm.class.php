@@ -33,6 +33,13 @@ class DBQuery{
 			return '`'.mysql_real_escape_string($val).'`';
 		} 
 	}
+	private function escaped($val){
+		return "'".mysql_real_escape_string($val)."'";
+	}
+	
+	function __construct($tbl = ''){
+		if(!empty($tbl)) $this->table($tbl);
+	}
 	
 	public function table($tbl){
 		if(is_string($tbl)){
@@ -68,7 +75,7 @@ class DBQuery{
 		return $this;
 	}
 	
-	public function select($fld = '*'){
+	public function select($fld = '*', $iterator = ''){
 		if(is_string($fld)){
 			$this->fields = array($fld);
 		}
@@ -80,7 +87,7 @@ class DBQuery{
 	
 		// SELECT
 		foreach($this->fields as $fld){
-			$sql .= $this->escape($fld).', ';
+			$sql .= ($fld == '*') ? '*, ' : $this->escape($fld).', ';
 		}
 		$sql = substr($sql, 0, -2);
 	
@@ -98,7 +105,7 @@ class DBQuery{
  		    	$qs = explode(':', $key);
  		    	$field = $qs[0];
    				$operat = isset($qs[1]) ? $qs[1] : '=';
-   				$sql .= " {$this->escape($field)} $operat '".mysql_real_escape_string($val)."' AND";    
+   				$sql .= " {$this->escape($field)} $operat {$this->escaped($val)} AND";    
    			}
 			$sql = substr($sql, 0, -3);			
 		}
@@ -122,23 +129,51 @@ class DBQuery{
 			$sql .= ' LIMIT '.$limit1.', '.$limit2.' ';		
 		}
 				
-		//echo $sql;
+		echo $sql;
 				
 		$this->query = mysql_query($sql);
-		if($this->query){
-			return $this->query;
-			return false;
-		}
-	
-	}
-	
-	public function iterator($func){
-		if($this->query && is_callable($func)){		
-			while($row = mysql_fetch_assoc($this->query)){
-				$func($row);
+		if($this->query){			
+			if(is_callable($iterator)){		
+				while($row = mysql_fetch_assoc($this->query)){
+					$iterator($row);
+				}
 			}
+			return $this->query;
 		} else return false;
+	
 	}
+	
+	public function insert($data){
+		$sql = 'INSERT INTO '.$this->escape($this->tables[0]);
+		if(is_array($data)){
+			$fields = array();
+			$values = array();
+			foreach($data as $key => $val){
+				$fields[] = $this->escape($key);
+				$values[] = $this->escaped($val);
+			}
+			
+			$sql .= ' ('.implode(',', $fields).') VALUES ('.implode(',', $values).')';
+		
+			echo $sql;
+			
+			return mysql_query($sql);
+		} else return false;
+	
+	}
+	
+	public function update($data){
+	
+	
+	}
+
+	public function delete(){
+	
+	
+	}
+	
+
+
 	
 	
 }	
