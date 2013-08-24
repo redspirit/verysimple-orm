@@ -204,8 +204,44 @@ class DBQuery{
 	}
 	
 	public function update($data){
-	
-	
+		$sql = 'UPDATE ';
+		
+		foreach($this->tables as $tbl){
+			$sql .= $this->escape($tbl);
+			break;
+		}
+
+		$sql .= ' SET ';
+		
+		if(is_array($data)){
+			foreach($data as $key => $val){
+				$sql .= $this->escape($key).' = '.$this->escaped($val).', ';
+			}
+			$sql = substr($sql, 0, -2);
+			
+			
+			//WHERE
+			if(count($this->wheres)>0){
+				$sql .= ' WHERE ';
+				foreach($this->wheres as $key => $val){
+					$qs = explode(':', $key);
+					$field = $qs[0];
+					$operat = isset($qs[1]) ? $qs[1] : '=';
+					$sql .= " {$this->escapes($field)} $operat {$this->escaped($val)} AND";    
+				}
+				$sql = substr($sql, 0, -3);			
+			}			
+			
+			// LIMIT
+			if($this->limit1 > 0){
+				$sql .= ' LIMIT '.$this->limit2.', '.$this->limit1.' ';		
+			}			
+			
+			//echo $sql;
+			
+			return mysql_query($sql);
+		} else return false;
+
 	}
 
 	public function delete(){

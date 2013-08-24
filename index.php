@@ -15,7 +15,7 @@ $q->insert(array(
 ));
 */
 
-$q->where(array('id:>' => 0));
+$q->where(array('id' => 3));
 $q->sort('id', -1);
 
 /*
@@ -25,7 +25,12 @@ $q->select(function($row){
 });
 */
 
+/*
 $r = $q->select_one('name');
 print_r($r);
+*/
 
-
+$q->update(array(
+	'name' => 'up_gonza',
+	'city' => 'ip_marokko'
+));
