@@ -15,7 +15,7 @@ $q->insert(array(
 ));
 */
 
-$q->where(array('id' => 4));
+$q->where(array('id:>' => 0));
 $q->sort('id', -1);
 
 /*
@@ -25,5 +25,7 @@ $q->select(function($row){
 });
 */
 
+$r = $q->select_one('name');
+print_r($r);
 
-$q->delete();
+

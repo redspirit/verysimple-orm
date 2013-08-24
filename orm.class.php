@@ -78,18 +78,7 @@ class DBQuery{
 		return $this;
 	}
 	
-	public function select($fld = '*', $iterator = ''){
-		if(is_callable($fld)){ // на случай, если передается только функция для итератора
-			$iterator = $fld;
-			$fld = '*';
-		}
-		if(is_string($fld)){
-			$this->fields = array($fld);
-		}
-		if(is_array($fld)){
-			$this->fields = $fld;
-		}		
-	
+	private function make_select(){
 		$sql = 'SELECT ';
 	
 		// SELECT
@@ -136,11 +125,28 @@ class DBQuery{
 		}
 
 		// LIMIT
-		if($limit1 > 0){
-			$sql .= ' LIMIT '.$limit1.', '.$limit2.' ';		
+		if($this->limit1 > 0){
+			$sql .= ' LIMIT '.$this->limit2.', '.$this->limit1.' ';		
 		}
+
+		return $sql;
+	}
+	
+	public function select($fld = '*', $iterator = ''){
+		if(is_callable($fld)){ // на случай, если передается только функция для итератора
+			$iterator = $fld;
+			$fld = '*';
+		}
+		if(is_string($fld)){
+			$this->fields = array($fld);
+		}
+		if(is_array($fld)){
+			$this->fields = $fld;
+		}		
+	
+		$sql = $this->make_select();
 				
-		echo $sql;
+		//echo $sql;
 				
 		$this->query = mysql_query($sql);
 		if($this->query){			
@@ -150,8 +156,32 @@ class DBQuery{
 				}
 			}
 			return $this->query;
-		} else return false;
+		} else 
+			return false;
 	
+	}
+	
+	public function select_one($fld = '*'){
+		if(is_string($fld)){
+			$this->fields = array($fld);
+		}
+		if(is_array($fld)){
+			$this->fields = $fld;
+		}		
+	
+		$this->limit1 = 1;
+		$sql = $this->make_select();
+	
+		//echo $sql;
+	
+		$this->query = mysql_query($sql);
+	
+		if($this->query){
+			$result = mysql_fetch_assoc($this->query);
+			if(count($result) == 1) $result = reset($result);
+			return $result;
+		} else 
+			return false;
 	}
 	
 	public function insert($data){
@@ -200,6 +230,9 @@ class DBQuery{
 		return mysql_query($sql);
 	}
 	
+	public function query($sql){
+		return mysql_query($sql);
+	}
 
 
 	
