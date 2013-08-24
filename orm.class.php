@@ -36,6 +36,9 @@ class DBQuery{
 	private function escaped($val){
 		return "'".mysql_real_escape_string($val)."'";
 	}
+	private function escapes($val){
+		return mysql_real_escape_string($val);
+	}
 	
 	function __construct($tbl = ''){
 		if(!empty($tbl)) $this->table($tbl);
@@ -76,6 +79,10 @@ class DBQuery{
 	}
 	
 	public function select($fld = '*', $iterator = ''){
+		if(is_callable($fld)){ // на случай, если передается только функция для итератора
+			$iterator = $fld;
+			$fld = '*';
+		}
 		if(is_string($fld)){
 			$this->fields = array($fld);
 		}
@@ -86,8 +93,12 @@ class DBQuery{
 		$sql = 'SELECT ';
 	
 		// SELECT
-		foreach($this->fields as $fld){
-			$sql .= ($fld == '*') ? '*, ' : $this->escape($fld).', ';
+		foreach($this->fields as $key => $val){
+			if(is_string($key)){
+				$sql .= $this->escapes($key).' as '.$this->escaped($val).', ';
+			} else {
+				$sql .= $this->escapes($val).', ';			
+			}
 		}
 		$sql = substr($sql, 0, -2);
 	

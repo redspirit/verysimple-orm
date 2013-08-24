@@ -17,6 +17,7 @@ $q->insert(array(
 
 $q->where(array('id:>' => '0'));
 $q->sort('id', -1);
-$q->select('*',function($row){
+$q->select(function($row){
+	echo '<br>';
 	print_r($row);
 });
