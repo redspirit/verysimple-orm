@@ -10,7 +10,6 @@ function data_base_connect($db_name, $login, $pass, $host = 'localhost'){
 	return $db_link;
 };
 
-
 class DBQuery{
 	private $tables = array();
 	private $limit1 = 0;
@@ -42,6 +41,7 @@ class DBQuery{
 	
 	function __construct($tbl = ''){
 		if(!empty($tbl)) $this->table($tbl);
+		//return $this;
 	}
 	
 	public function table($tbl){
@@ -178,7 +178,7 @@ class DBQuery{
 	
 		if($this->query){
 			$result = mysql_fetch_assoc($this->query);
-			if(count($result) == 1) $result = reset($result);
+			if(count($result) == 1 && is_array($result)) $result = reset($result);
 			return $result;
 		} else 
 			return false;
@@ -275,7 +275,9 @@ class DBQuery{
 	
 }	
 	
-	
+function dbq($table){
+	return new DBQuery($table);
+}	
 	
 	
 	

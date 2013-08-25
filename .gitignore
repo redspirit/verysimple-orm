@@ -15,6 +15,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
+index.php
 
 # External tool builders
 .externalToolBuilders/
