@@ -188,8 +188,10 @@ class DBQuery{
 
 				if($this->query){
 					$result = $this->query->fetch_array(MYSQLI_ASSOC);
-					if(count($result) == 1 && is_array($result)) $result = reset($result);
-					return $result;
+					if(count($result) == 1 && is_array($result))
+						return reset($result);
+					else
+						return false;
 				} else
 					return false;
 			}
@@ -206,9 +208,13 @@ class DBQuery{
 
 					$sql .= ' ('.implode(',', $fields).') VALUES ('.implode(',', $values).')';
 
-					echo $sql;
+					//echo $sql;
 
-					return $this->connection->query($sql);
+					$res = $this->connection->query($sql);
+
+					// $this->connection->error
+
+					return $res ? $this->connection->insert_id : false;
 				} else return false;
 
 			}
@@ -250,7 +256,9 @@ class DBQuery{
 					//echo $sql;
 
 					return $this->connection->query($sql);
-				} else return false;
+					
+				} else 
+					return false;
 
 			}
 
